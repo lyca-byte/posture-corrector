@@ -771,36 +771,46 @@ class MainController(QMainWindow):
             self.ui.actionPop_up_Mode.setText("Pop-up: OFF")
             self.ui.statusbar.showMessage("Pop-up mode disabled", 3000)
 
-    def selectNotification(self):
-        options = ["Sound Only", "Pop-up Only", "Sound + Pop-up", "None"]
-        choice, ok = QInputDialog.getItem(self, "Select Notification Mode",
-                                        "Choose how you want to receive posture alerts:",
-                                        options, 0, False)
-        if ok and choice:
-            if choice == "Sound Only":
-                self.is_muted = False
-                self.popup_mode = False
-                self.ui.actionMute.setText("Unmute")
-                self.ui.actionPop_up_Mode.setText("Pop-up: OFF")
-                self.ui.statusbar.showMessage("Notification mode: Sound Only", 3000)
-            elif choice == "Pop-up Only":
-                self.is_muted = True
-                self.popup_mode = True
-                self.ui.actionMute.setText("Mute")
-                self.ui.actionPop_up_Mode.setText("Pop-up: ON")
-                self.ui.statusbar.showMessage("Notification mode: Pop-up Only", 3000)
-            elif choice == "Sound + Pop-up":
-                self.is_muted = False
-                self.popup_mode = True
-                self.ui.actionMute.setText("Unmute")
-                self.ui.actionPop_up_Mode.setText("Pop-up: ON")
-                self.ui.statusbar.showMessage("Notification mode: Sound + Pop-up", 3000)
-            elif choice == "None":
-                self.is_muted = True
-                self.popup_mode = False
-                self.ui.actionMute.setText("Mute")
-                self.ui.actionPop_up_Mode.setText("Pop-up: OFF")
-                self.ui.statusbar.showMessage("Notification mode: None", 3000)
+    def selectNotification(self): #Salah, harusnya pilih file suara
+        # options = ["Sound Only", "Pop-up Only", "Sound + Pop-up", "None"]
+        # choice, ok = QInputDialog.getItem(self, "Select Notification Mode",
+        #                                 "Choose how you want to receive posture alerts:",
+        #                                 options, 0, False)
+        # if ok and choice:
+        #     if choice == "Sound Only":
+        #         self.is_muted = False
+        #         self.popup_mode = False
+        #         self.ui.actionMute.setText("Unmute")
+        #         self.ui.actionPop_up_Mode.setText("Pop-up: OFF")
+        #         self.ui.statusbar.showMessage("Notification mode: Sound Only", 3000)
+        #     elif choice == "Pop-up Only":
+        #         self.is_muted = True
+        #         self.popup_mode = True
+        #         self.ui.actionMute.setText("Mute")
+        #         self.ui.actionPop_up_Mode.setText("Pop-up: ON")
+        #         self.ui.statusbar.showMessage("Notification mode: Pop-up Only", 3000)
+        #     elif choice == "Sound + Pop-up":
+        #         self.is_muted = False
+        #         self.popup_mode = True
+        #         self.ui.actionMute.setText("Unmute")
+        #         self.ui.actionPop_up_Mode.setText("Pop-up: ON")
+        #         self.ui.statusbar.showMessage("Notification mode: Sound + Pop-up", 3000)
+        #     elif choice == "None":
+        #         self.is_muted = True
+        #         self.popup_mode = False
+        #         self.ui.actionMute.setText("Mute")
+        #         self.ui.actionPop_up_Mode.setText("Pop-up: OFF")
+        #         self.ui.statusbar.showMessage("Notification mode: None", 3000)
+
+        file_path, _ = QFileDialog.getOpenFileName(
+        self,
+        "Select Notification Sound",
+        "",
+        "Audio Files (*.mp3 *.wav *.ogg);;All Files (*)"
+        )
+        if file_path:
+            self.sound_file = file_path
+            self.ui.statusbar.showMessage(f"Notification sound selected: {file_path}", 3000)
     
     # def About(self):
     #     dialog = QDialog(self)
