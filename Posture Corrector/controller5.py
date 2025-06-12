@@ -8,10 +8,12 @@ Make Graph for Accuracy and Status
 Integrating all trigger function to newest UI
 Integrating graph to function
 Make function for tutorial
+TANPA FITUR EXPORT TO EXCEL
 '''
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 
 import cv2
 import numpy as np
@@ -20,9 +22,23 @@ import mediapipe as mp
 # from playsound import playsound
 import pygame
 import pyqtgraph as pg
-import pandas as pd
+# import pandas as pd
 
-from FIX_display5 import Ui_MainWindow
+from FIX_display7 import Ui_MainWindow
+
+import os
+import sys
+
+def resource_path(relative_path):
+    """Mendapatkan path absolut ke resource (gambar, mp3, dll), mendukung development & frozen mode"""
+    if hasattr(sys, '_MEIPASS'):
+        # Saat aplikasi sudah di-bundle
+        base_path = sys._MEIPASS
+    else:
+        # Saat development
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 
 class MainController(QMainWindow):
     def __init__(self):
@@ -40,7 +56,7 @@ class MainController(QMainWindow):
         self.ui.actionSelect_Notification.triggered.connect(self.selectNotification)
         self.ui.actionAbout.triggered.connect(self.About)
         self.ui.actionTutorial.triggered.connect(self.Tutorial)
-        self.ui.actionExport_to_Excel.triggered.connect(self.Export_to_Excel)
+        # self.ui.actionExport_to_Excel.triggered.connect(self.Export_to_Excel)
 
         self.camera_active = False
         self.start_time = None #Representasi waktu
@@ -63,7 +79,7 @@ class MainController(QMainWindow):
         self.nose_threshold = 0
         self.last_alert_time = 0
         self.alert_cooldown = 5
-        self.sound_file = "C:/Users/ASUS/Documents/AI/pn.mp3"
+        self.sound_file = resource_path("sounds/pn.mp3")
 
         #Graph Initialization
         #Graph Status
@@ -457,27 +473,25 @@ class MainController(QMainWindow):
         dialog.setLayout(layout)
         dialog.exec()
 
-    def Export_to_Excel(self):
-        if not self.posture_log:
-            QMessageBox.information(self, "No Data", "No posture data available to export.")
-            return
+    # def Export_to_Excel(self):
+    #     if not self.posture_log:
+    #         QMessageBox.information(self, "No Data", "No posture data available to export.")
+    #         return
 
-        file_path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Posture Report",
-            "posture_report.xlsx",
-            "Excel Files (*.xlsx)"
-        )
+    #     file_path, _ = QFileDialog.getSaveFileName(
+    #         self,
+    #         "Save Posture Report",
+    #         "posture_report.xlsx",
+    #         "Excel Files (*.xlsx)"
+    #     )
 
-        if file_path:
-            try:
-                df = pd.DataFrame(self.posture_log, columns=["Time", "Posture Status", "Accuracy (%)"])
-                df.to_excel(file_path, index=False)
-                self.ui.statusbar.showMessage(f"Data successfully exported to {file_path}", 5000)
-            except Exception as e:
-                QMessageBox.critical(self, "Export Error", f"Failed to export data:\n{e}")
-
-
+    #     if file_path:
+    #         try:
+    #             df = pd.DataFrame(self.posture_log, columns=["Time", "Posture Status", "Accuracy (%)"])
+    #             df.to_excel(file_path, index=False)
+    #             self.ui.statusbar.showMessage(f"Data successfully exported to {file_path}", 5000)
+    #         except Exception as e:
+    #             QMessageBox.critical(self, "Export Error", f"Failed to export data:\n{e}")
         
     def closeEvent(self, event):
         if hasattr(self, 'capture') and self.capture is not None:
