@@ -31,7 +31,9 @@ The system processes camera input locally on the user's computer, allowing postu
 
 ## Application Interface
 Below is the main interface of POSREVICE.
+
 ![POSREVICE Pop Up Tutorial](docs/pop-up%20tutorial.png)
+
 ![POSREVICE Main Interface](docs/main.png)
 
 ---
