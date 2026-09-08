@@ -10,6 +10,8 @@ Integrating graph to function
 Make function for tutorial
 TANPA FITUR EXPORT TO EXCEL
 '''
+import mediapipe as mp
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -18,7 +20,7 @@ from PyQt5.QtWidgets import *
 import cv2
 import numpy as np
 import time
-import mediapipe as mp
+
 # from playsound import playsound
 import pygame
 import pyqtgraph as pg
@@ -30,12 +32,9 @@ import os
 import sys
 
 def resource_path(relative_path):
-    """Mendapatkan path absolut ke resource (gambar, mp3, dll), mendukung development & frozen mode"""
-    if hasattr(sys, '_MEIPASS'):
-        # Saat aplikasi sudah di-bundle
-        base_path = sys._MEIPASS
-    else:
-        # Saat development
+    try:
+        base_path = sys._MEIPASS  # Untuk Nuitka atau PyInstaller
+    except Exception:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
@@ -45,7 +44,7 @@ class MainController(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        pygame.mixer.init() #For Notification
+        # pygame.mixer.init() #For Notification
 
         #QActionTrigger
         self.ui.streaming.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -79,7 +78,15 @@ class MainController(QMainWindow):
         self.nose_threshold = 0
         self.last_alert_time = 0
         self.alert_cooldown = 5
-        self.sound_file = resource_path("sounds/pn.mp3")
+        self.sound_file = resource_path(os.path.join("assets", "pn.mp3"))
+        # self.sound_file="/sounds/pn.mp3"
+        
+        try:
+            pygame.mixer.init()
+            self.audio_available = True
+        except pygame.error as e:
+            print(f"Audio init failed: {e}")
+            self.audio_available = False
 
         #Graph Initialization
         #Graph Status
@@ -372,15 +379,36 @@ class MainController(QMainWindow):
             self.ui.statusbar.showMessage("Pop-up mode disabled", 3000)
 
     def selectNotification(self):
+        # file_path, _ = QFileDialog.getOpenFileName(
+        # self,
+        # "Select Notification Sound",
+        # "",
+        # "Audio Files (*.mp3 *.wav *.ogg);;All Files (*)"
+        # )
+        # if file_path:
+        #     self.sound_file = file_path
+        #     self.ui.statusbar.showMessage(f"Notification sound selected: {file_path}", 3000)
+
         file_path, _ = QFileDialog.getOpenFileName(
         self,
         "Select Notification Sound",
         "",
         "Audio Files (*.mp3 *.wav *.ogg);;All Files (*)"
-        )
+    )
         if file_path:
-            self.sound_file = file_path
-            self.ui.statusbar.showMessage(f"Notification sound selected: {file_path}", 3000)
+            if os.path.exists(file_path):
+                try:
+                    # Update path ke file suara baru
+                    self.sound_file = file_path
+
+                    # Opsional: Preload suara agar siap digunakan (tidak langsung play)
+                    pygame.mixer.music.load(self.sound_file)
+
+                    self.ui.statusbar.showMessage(f"Notification sound selected: {os.path.basename(file_path)}", 3000)
+                except Exception as e:
+                    QMessageBox.warning(self, "Error", f"Failed to load sound file:\n{str(e)}")
+            else:
+                QMessageBox.warning(self, "File Not Found", "The selected file does not exist.")
     
     # def About(self):
     #     dialog = QDialog(self)
